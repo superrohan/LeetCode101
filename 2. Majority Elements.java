@@ -50,6 +50,11 @@ If a true majority exists, this process guarantees the final candidate is that m
 */
 
 
+/*
+Time Complexity: O(n) since it passes through the array once.
+Space Complexity: O(1) since only a few additional variables are used.
+*/
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // Sorting the Array
@@ -65,3 +70,8 @@ class Solution {
         return nums[nums.length / 2];
     }
 }
+
+/*
+Time Complexity: O(n log n) due to sorting.
+Space Complexity: O(1) when using in-place sorting (ignoring input space).
+*/
