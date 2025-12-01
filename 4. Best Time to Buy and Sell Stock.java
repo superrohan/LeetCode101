@@ -54,6 +54,6 @@ Return maxProfit after the scan.
 */
 
 /*
-Time Complexity: O(n) since iterating through the prices array once.
-Space Complexity: O(1) since uses constant space.
+Time Complexity: O(n) due to single loop.
+Space Complexity: O(1) as no extra space is used.
 */
