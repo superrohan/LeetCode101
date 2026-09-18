@@ -1,0 +1,770 @@
+You are acting as a Senior Java/Spring Boot Architect, Technical Writer, and Application Documentation Specialist.
+
+The current VS Code workspace contains TWO independent Java Spring Boot applications:
+
+1. controller — ControllerApp
+2. scheduler — SchedulerApp
+
+Your task is to analyze the complete workspace and CREATE production-quality, Confluence-ready technical documentation for both applications.
+
+IMPORTANT:
+A previous session has already established that the workspace is accessible and contains the source code, Maven files, resources, tests, GitLab CI configuration, and Helm/Kubernetes deployment files for both repositories.
+
+Do not waste time performing a generic workspace reconnaissance report.
+
+Proceed directly with analyzing the actual source code and producing the documentation.
+
+==================================================
+PRIMARY OBJECTIVE
+==================================================
+
+Create THREE separate Markdown files:
+
+1. CONTROLLERAPP_DOCUMENTATION.md
+2. SCHEDULERAPP_DOCUMENTATION.md
+3. APPLICATION_ARCHITECTURE.md
+
+The first two files must contain complete, independently understandable documentation for their respective applications.
+
+The third file must document ONLY the relationship and interaction between ControllerApp and SchedulerApp.
+
+Do not combine the two application documentations into one giant document.
+
+==================================================
+CRITICAL RULES
+==================================================
+
+1. DOCUMENTATION ONLY
+
+Do NOT modify:
+
+- Java source code
+- Configuration files
+- Maven/Gradle files
+- SQL
+- Database migrations
+- Docker files
+- Kubernetes files
+- Helm files
+- CI/CD files
+- Git configuration
+- Existing application logic
+
+Only create/update the three requested documentation Markdown files.
+
+Do not refactor or "improve" application code.
+
+Do not fix bugs.
+
+Do not install dependencies.
+
+Do not change project configuration.
+
+Do not run database migrations.
+
+Do not connect to databases.
+
+Do not call external APIs.
+
+Do not deploy anything.
+
+==================================================
+2. STATIC SOURCE ANALYSIS
+==================================================
+
+Analyze the source code, configuration, tests, deployment files, CI/CD files and repository documentation.
+
+Understand HOW THE APPLICATION ACTUALLY WORKS.
+
+Do not merely list classes.
+
+Trace important flows through the application.
+
+For example:
+
+Controller
+→ Service
+→ Repository
+→ Database
+
+or:
+
+Controller
+→ Service
+→ External API Client
+→ External System
+
+or:
+
+Scheduler
+→ Service
+→ Repository
+→ External System
+
+Document the actual implementation.
+
+==================================================
+3. NO HALLUCINATION
+==================================================
+
+Accuracy is more important than completeness.
+
+Never invent:
+
+- Business logic
+- APIs
+- Database tables
+- External systems
+- Security mechanisms
+- Deployment architecture
+- Configuration
+- Performance characteristics
+- Operational procedures
+- Business requirements
+
+Only document information supported by:
+
+- Source code
+- Configuration
+- Tests
+- Maven files
+- SQL/migrations
+- Helm/Kubernetes files
+- CI/CD files
+- README/documentation
+
+Clearly distinguish:
+
+CONFIRMED:
+Directly supported by repository evidence.
+
+INFERRED:
+Reasonable interpretation based on implementation.
+
+UNKNOWN:
+Cannot be determined from the repository.
+
+If something cannot be determined, write:
+
+"Not determinable from the available repository."
+
+Never present an inference as a confirmed fact.
+
+==================================================
+4. SECURITY / SENSITIVE INFORMATION
+==================================================
+
+This is an internal enterprise codebase.
+
+NEVER expose:
+
+- Passwords
+- API keys
+- OAuth client secrets
+- Access tokens
+- JWT tokens
+- Private keys
+- Certificates
+- Vault secrets
+- Database credentials
+- Sensitive connection strings
+- Personal information
+- Secret configuration values
+
+If sensitive configuration exists, document the mechanism without exposing the value.
+
+Example:
+
+Database password:
+"Managed through secure configuration/secret management."
+
+Do not inspect or reproduce binary keystores or private certificates.
+
+If necessary, write:
+
+[REDACTED]
+
+Preserve useful property names where they are not themselves sensitive.
+
+==================================================
+5. ANALYZE BOTH APPLICATIONS
+==================================================
+
+Analyze ControllerApp and SchedulerApp independently.
+
+Do not mix their implementation details.
+
+After independently understanding both applications, determine whether they interact.
+
+Investigate:
+
+- REST calls
+- HTTP clients
+- Shared databases
+- Messaging
+- Shared libraries
+- Shared configuration
+- Authentication relationships
+- Event communication
+- Operational dependencies
+
+Only document relationships that are supported by repository evidence.
+
+==================================================
+CONTROLLERAPP_DOCUMENTATION.md
+==================================================
+
+Create comprehensive documentation with the following structure:
+
+# ControllerApp — Technical Documentation
+
+## 1. Document Information
+
+Include:
+
+- Application name
+- Repository
+- Java version
+- Spring Boot version
+- Build tool
+- Packaging
+- Documentation scope
+- Known documentation gaps
+
+## 2. Executive Summary
+
+Explain what ControllerApp does in clear language.
+
+Write this so that a developer, architect, BA or support engineer can understand the application.
+
+## 3. Business Purpose
+
+Explain the business capability implemented by ControllerApp.
+
+Base this strictly on the implementation and repository documentation.
+
+## 4. High-Level Architecture
+
+Explain the architecture.
+
+Identify:
+
+- Entry points
+- Controllers
+- Services
+- Repositories
+- External clients
+- Databases
+- Supporting components
+
+Create an accurate Mermaid architecture diagram.
+
+## 5. Technology Stack
+
+Create:
+
+| Technology | Version | Purpose |
+|---|---|---|
+
+Only include technologies actually found in the repository.
+
+## 6. Project / Package Structure
+
+Explain the important packages.
+
+Do not document trivial getters/setters or unimportant POJOs individually.
+
+Identify the most important classes/files.
+
+## 7. Application Entry Point
+
+Document:
+
+- Main Spring Boot class
+- Application startup
+- Important configuration
+- Component scanning
+- Profiles
+
+## 8. Controllers and REST APIs
+
+Identify ALL meaningful REST endpoints.
+
+Create:
+
+| HTTP Method | Endpoint | Controller | Purpose | Request | Response | Authentication | Downstream Flow |
+|---|---|---|---|---|---|---|---|
+
+Trace each important endpoint into the service/business layer.
+
+Do not invent API behavior.
+
+## 9. Major Business Workflows
+
+Identify the important business workflows.
+
+For each:
+
+1. Trigger
+2. Entry point
+3. Validation
+4. Business processing
+5. Database interaction
+6. External integrations
+7. Result
+8. Error handling
+
+Create Mermaid sequence diagrams for major flows.
+
+## 10. Component Responsibilities
+
+Document important:
+
+- Controllers
+- Services
+- Repositories
+- Clients
+- Configuration classes
+- Utilities
+- Processors
+
+Include source file paths.
+
+## 11. Database / Persistence
+
+Identify:
+
+- Database technology
+- ORM
+- Entities
+- Repositories
+- Tables/collections
+- Queries
+- Transactions
+- Migration mechanism
+- Connection pooling
+
+Create:
+
+| Entity/Model | Table/Collection | Repository | Purpose |
+|---|---|---|---|
+
+Do not expose database credentials.
+
+## 12. External Integrations
+
+Automatically identify external systems from the code.
+
+For each:
+
+| System | Integration Type | Purpose | Calling Component | Authentication | Failure Handling |
+|---|---|---|---|---|---|
+
+Do not invent integrations.
+
+## 13. Security
+
+Document confirmed:
+
+- Authentication
+- Authorization
+- Spring Security
+- OAuth/OIDC
+- JWT
+- SAML
+- Filters
+- Roles
+- Permissions
+- CORS
+- CSRF
+- Service-to-service authentication
+
+Create a security flow diagram where useful.
+
+Do not expose credentials or tokens.
+
+## 14. Configuration
+
+Document important configuration properties.
+
+Group into:
+
+- Application
+- Database
+- External systems
+- Security
+- Logging
+- Scheduling
+- Feature flags
+- Monitoring
+
+Use:
+
+| Property | Purpose | Source/Profile | Sensitive |
+|---|---|---|---|
+
+Never include secret values.
+
+## 15. Scheduled / Background Processing
+
+Identify:
+
+- @Scheduled methods
+- Async processing
+- Executors
+- Background jobs
+- Event listeners
+- Retry processing
+
+Document actual schedules and behavior only when discoverable.
+
+## 16. Error Handling
+
+Document:
+
+- Global exception handling
+- Custom exceptions
+- Validation errors
+- External API failures
+- Database failures
+- Retry/fallback mechanisms
+- HTTP error responses
+
+## 17. Logging and Monitoring
+
+Document confirmed:
+
+- Logging framework
+- Log levels
+- Correlation IDs
+- Health checks
+- Spring Actuator
+- Metrics
+- ELK
+- Grafana
+- Prometheus
+- Other monitoring mechanisms
+
+## 18. Deployment Architecture
+
+Analyze:
+
+- Helm
+- Kubernetes
+- AKS
+- ConfigMaps
+- Secrets
+- Services
+- Ingress
+- Probes
+- Resources
+- Environment variables
+
+Create an accurate Mermaid deployment diagram.
+
+## 19. CI/CD
+
+Analyze GitLab CI configuration.
+
+Document:
+
+- Build
+- Test
+- Static analysis
+- Security scanning
+- Artifact/container creation
+- Deployment
+- Environment promotion
+
+Only document what is actually present.
+
+## 20. Testing
+
+Document:
+
+- Unit tests
+- Integration tests
+- Controller tests
+- Service tests
+- Repository tests
+- Mocking
+- Important test scenarios
+
+Never invent coverage percentages.
+
+## 21. Dependencies
+
+Analyze Maven dependencies.
+
+Group important dependencies into:
+
+- Spring
+- Database
+- Security
+- HTTP
+- Messaging
+- Observability
+- Testing
+- Internal libraries
+
+## 22. Production Support / Runbook
+
+Based on actual application behavior, document:
+
+- Health checks
+- Important logs
+- Failure points
+- Troubleshooting approach
+- External dependencies
+- Database dependencies
+- Common failure scenarios that can be established from code
+
+Clearly distinguish confirmed procedures from recommendations/inferences.
+
+## 23. Technical Risks / Technical Debt
+
+Identify observable issues such as:
+
+- Deprecated dependencies
+- TODO/FIXME
+- Missing tests
+- Tight coupling
+- Duplicate code
+- Complex methods
+- Hard-coded configuration
+- Error-handling gaps
+- Configuration inconsistencies
+
+For every finding:
+
+| Finding | Evidence | Potential Impact | Confidence |
+|---|---|---|---|
+
+Do not exaggerate.
+
+## 24. New Developer Onboarding
+
+Explain:
+
+"How should a new developer understand ControllerApp?"
+
+Provide:
+
+- Recommended reading order
+- 5–10 most important files/classes
+- Important business flows
+- Important configuration
+- Important external systems
+
+## 25. Glossary
+
+Explain important application/business/technical terms.
+
+## 26. Documentation Gaps
+
+List information that cannot be determined from the repository and requires confirmation from:
+
+- Developer
+- Architect
+- BA
+- DevOps
+- Operations
+
+==================================================
+SCHEDULERAPP_DOCUMENTATION.md
+==================================================
+
+Create the same level of documentation for SchedulerApp.
+
+Use the same structure, but adapt it to the actual implementation.
+
+Pay particular attention to:
+
+- Scheduling
+- Job orchestration
+- Cron expressions
+- Scheduled services
+- Execution flow
+- Concurrency
+- Retry behavior
+- Failure handling
+- Database interaction
+- External systems
+- ControllerApp interaction
+- Deployment
+- Operational support
+
+Do NOT assume SchedulerApp has REST APIs if the source code does not contain them.
+
+==================================================
+APPLICATION_ARCHITECTURE.md
+==================================================
+
+Create a separate document:
+
+# ControllerApp & SchedulerApp — Application Architecture
+
+Include:
+
+## 1. System Overview
+
+Explain how the two applications fit into the overall system.
+
+## 2. Application Responsibilities
+
+| Application | Responsibility |
+|---|---|
+
+## 3. Application Interaction
+
+Document actual communication between the applications.
+
+Examples:
+
+- REST
+- HTTP
+- Database
+- Messaging
+- Shared services
+
+Only document confirmed interactions.
+
+## 4. End-to-End Business Flow
+
+Explain major cross-application workflows.
+
+## 5. Cross-Application Sequence Diagrams
+
+Create Mermaid diagrams showing actual interaction.
+
+## 6. Shared Dependencies
+
+Document shared:
+
+- Databases
+- External systems
+- Authentication
+- Configuration
+- Infrastructure
+
+Only where confirmed.
+
+## 7. Deployment Relationship
+
+Explain how the applications are deployed and operate together based on repository evidence.
+
+## 8. Operational Dependencies
+
+Explain what could affect one application when another system/application is unavailable.
+
+Clearly distinguish confirmed dependencies from inferred ones.
+
+==================================================
+SOURCE TRACEABILITY
+==================================================
+
+For important architectural statements include source file paths.
+
+Example:
+
+Evidence:
+
+src/main/java/.../ScanCycleController.java
+
+→ ScanPipelineService.java
+
+→ ScanRepository.java
+
+This allows developers to verify documentation against the code.
+
+==================================================
+MERMAID DIAGRAM REQUIREMENT
+==================================================
+
+Use Mermaid diagrams where they materially improve understanding.
+
+Include diagrams for:
+
+- High-level architecture
+- Important business flows
+- Important API flows
+- Database interaction
+- External integration
+- Security flow
+- Deployment
+- ControllerApp ↔ SchedulerApp interaction
+
+Make diagrams represent the ACTUAL code.
+
+Do not use generic diagrams that are unrelated to the implementation.
+
+==================================================
+DOCUMENTATION QUALITY
+==================================================
+
+The final Markdown must be:
+
+- Professional
+- Confluence-ready
+- Easy to navigate
+- Technically detailed
+- Understandable by developers
+- Understandable by architects
+- Understandable by BAs
+- Useful to production support
+- Evidence-based
+
+Avoid generic explanations of Spring Boot.
+
+Explain THIS application.
+
+Avoid copying source code.
+
+Do not document trivial implementation details.
+
+Focus on architecture, behavior, business flows and operational understanding.
+
+==================================================
+FINAL VERIFICATION
+==================================================
+
+Before finishing:
+
+1. Verify both repositories were analyzed.
+2. Verify ControllerApp information is not accidentally attributed to SchedulerApp.
+3. Verify SchedulerApp information is not accidentally attributed to ControllerApp.
+4. Verify APIs against actual controller mappings.
+5. Verify integrations against actual clients/configuration.
+6. Verify database information against actual entities/repositories/schema.
+7. Verify deployment information against actual Helm/Kubernetes/CI files.
+8. Verify Mermaid diagrams against actual implementation.
+9. Remove unsupported assumptions.
+10. Mark uncertain information as UNKNOWN or INFERRED.
+11. Search the generated documentation for secrets/credentials/tokens/passwords and remove any sensitive values.
+12. Ensure no application source code was modified.
+
+Only after completing the verification should you consider the documentation complete.
+
+==================================================
+FINAL OUTPUT
+==================================================
+
+Create these three files in the workspace:
+
+CONTROLLERAPP_DOCUMENTATION.md
+SCHEDULERAPP_DOCUMENTATION.md
+APPLICATION_ARCHITECTURE.md
+
+Do not merely paste the documentation into the chat.
+
+Actually create the Markdown files.
+
+Do not modify any other application files.
+
+At the end, report:
+
+- Files created
+- What each file contains
+- Any important documentation gaps
+- Confirmation that no application source/configuration files were modified
+- Confirmation that secrets were not included
