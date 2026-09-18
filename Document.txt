@@ -1,0 +1,1272 @@
+# Spring Boot Application Documentation — Repository Analysis & Confluence Documentation
+
+You are acting as a **Senior Java/Spring Boot Architect, Technical Writer, and Application Documentation Specialist**.
+
+Your task is to analyze the **entire VS Code workspace**, which contains **two Java Spring Boot applications**, and create comprehensive, accurate, Confluence-ready technical documentation for both applications.
+
+The documentation will be used by:
+
+* Java/Spring Boot developers
+* New developers onboarding to the applications
+* Solution/Technical Architects
+* Business Analysts
+* Production Support / Operations teams
+* DevOps / Platform teams
+* Other teams integrating with these applications
+
+---
+
+# CRITICAL RULES
+
+## 1. Analyze Before Documenting
+
+Do NOT start writing documentation immediately.
+
+First perform a complete reconnaissance of the workspace.
+
+Identify:
+
+* Both Spring Boot applications
+* Repository/application boundaries
+* Maven/Gradle configuration
+* Java version
+* Spring Boot version
+* Main application classes
+* Packages
+* Controllers
+* Services
+* Components
+* Repositories/DAOs
+* Entities/models/DTOs
+* Configuration classes
+* Security configuration
+* Database configuration
+* External API clients
+* HTTP clients
+* Messaging components
+* Scheduled jobs
+* Event listeners
+* Exception handlers
+* Filters/interceptors
+* Utility classes
+* Database migration scripts
+* Docker configuration
+* Kubernetes/AKS configuration
+* CI/CD configuration
+* Environment-specific configuration
+* Logging configuration
+* Monitoring/health-check configuration
+* Tests
+* Documentation already present in the repository
+
+Do not assume that a component exists simply because it is common in Spring Boot applications.
+
+Document only what you can establish from the source code, configuration, infrastructure files, tests, or repository documentation.
+
+---
+
+# 2. STRICT NO-HALLUCINATION POLICY
+
+Accuracy is more important than completeness.
+
+Never invent:
+
+* Business logic
+* API behavior
+* Database tables
+* Configuration
+* Architecture
+* Dependencies
+* External systems
+* Authentication mechanisms
+* Deployment details
+* Environment details
+* Scheduled jobs
+* Data flows
+* Error handling behavior
+* Performance characteristics
+* Business requirements
+
+If something cannot be determined from the repository, explicitly state:
+
+> "Not determinable from the available source code/configuration."
+
+If something is strongly implied but not explicitly documented, label it:
+
+> "Inference based on source code."
+
+Clearly distinguish:
+
+### Confirmed
+
+Directly supported by source code/configuration.
+
+### Inferred
+
+Reasonable architectural interpretation based on the implementation.
+
+### Unknown
+
+Cannot be established from the repository.
+
+Do NOT present an inference as a confirmed fact.
+
+---
+
+# 3. SECURITY AND UBS CONFIDENTIALITY
+
+This documentation is intended for an internal enterprise environment.
+
+NEVER expose or reproduce:
+
+* Passwords
+* API keys
+* Access tokens
+* OAuth client secrets
+* Certificates/private keys
+* Encryption keys
+* Vault secrets
+* Database credentials
+* Personal information
+* Authentication tokens
+* Session tokens
+* Internal credentials
+* Sensitive headers
+* Secrets embedded in configuration
+* Secret values contained in deployment files
+* Any other credential or secret
+
+If a secret exists, document only the mechanism.
+
+For example:
+
+Instead of:
+
+`spring.datasource.password=actualPassword`
+
+write:
+
+> Database password is supplied through secure configuration/secret management.
+
+If a configuration contains a secret value, redact it as:
+
+`[REDACTED]`
+
+Do not copy secrets into examples, tables, diagrams, or appendices.
+
+---
+
+# 4. DO NOT MODIFY THE APPLICATION
+
+This is a documentation-only task.
+
+DO NOT:
+
+* Modify Java code
+* Modify configuration
+* Modify dependencies
+* Modify Maven/Gradle files
+* Modify SQL
+* Modify Docker files
+* Modify Kubernetes files
+* Modify CI/CD files
+* Rename files
+* Delete files
+* Refactor code
+* Fix bugs
+* Change formatting
+* Generate production code
+
+Only analyze the repository and generate documentation.
+
+---
+
+# 5. DOCUMENT BOTH APPLICATIONS
+
+The workspace contains two Spring Boot applications.
+
+Treat them as:
+
+* Application A
+* Application B
+
+First understand each application independently.
+
+Then document their relationship.
+
+Do not merge their implementation details together unless there is a genuine dependency or interaction between them.
+
+If Application A calls Application B, consumes an API exposed by Application B, shares a database, communicates through messaging, or otherwise interacts with it, explicitly document that relationship.
+
+---
+
+# PHASE 1 — REPOSITORY RECONNAISSANCE
+
+Before producing the final documentation, inspect the workspace systematically.
+
+Analyze at minimum:
+
+```text
+pom.xml / build.gradle
+src/main/java
+src/main/resources
+src/test
+application.properties
+application.yml
+application-*.properties
+application-*.yml
+Dockerfile
+docker-compose files
+Kubernetes manifests
+Helm charts
+CI/CD configuration
+SQL scripts
+Flyway/Liquibase migrations
+README files
+architecture documentation
+```
+
+Also inspect other relevant files that reveal how the application works or is deployed.
+
+Create an internal understanding of:
+
+```text
+Application
+    ↓
+Entry Point
+    ↓
+Controllers / Consumers
+    ↓
+Services
+    ↓
+Repositories / Clients
+    ↓
+Databases / External Systems
+```
+
+Do not assume the application follows this exact structure. Adapt the model to the actual code.
+
+---
+
+# PHASE 2 — ARCHITECTURE EXTRACTION
+
+For each application identify:
+
+## Application identity
+
+* Application name
+* Main class
+* Purpose
+* Business capability
+* Java version
+* Spring Boot version
+* Build tool
+* Packaging type
+
+## Architectural style
+
+Determine whether the application uses:
+
+* Layered architecture
+* Hexagonal architecture
+* Clean architecture
+* MVC
+* Microservice architecture
+* Event-driven architecture
+* Batch processing
+* Scheduled processing
+* Other patterns
+
+Explain why you identified the architecture, referencing the actual implementation.
+
+---
+
+# PHASE 3 — COMPONENT ANALYSIS
+
+For every significant component identify:
+
+* Class/package
+* Responsibility
+* Dependencies
+* Input
+* Output
+* Important methods
+* Downstream dependencies
+* Upstream callers
+* Business significance
+
+Prioritize important components rather than generating meaningless documentation for every trivial getter/setter or POJO.
+
+---
+
+# CONTROLLERS AND APIs
+
+Identify every externally accessible REST endpoint.
+
+For each endpoint document:
+
+| Method | Endpoint | Controller | Purpose | Request | Response | Authentication | Downstream Components |
+| ------ | -------- | ---------- | ------- | ------- | -------- | -------------- | --------------------- |
+
+Where possible determine:
+
+* HTTP method
+* URL/path
+* Path variables
+* Query parameters
+* Request body
+* Response body
+* HTTP status codes
+* Validation
+* Authentication/authorization
+* Exceptions
+* Service methods invoked
+* External calls
+* Database operations
+
+Do not invent status codes or behavior.
+
+If the endpoint behavior is unclear, say so.
+
+---
+
+# BUSINESS FLOWS
+
+Identify the application's major business workflows.
+
+For every important workflow explain:
+
+1. Trigger
+2. Entry point
+3. Validation
+4. Processing
+5. Database interaction
+6. External system interaction
+7. Business rules
+8. Error handling
+9. Final response/result
+
+Write these flows in language understandable to both developers and BAs.
+
+Example structure:
+
+```text
+User/System
+    ↓
+REST API
+    ↓
+Controller
+    ↓
+Validation
+    ↓
+Service
+    ↓
+Database
+    ↓
+External System
+    ↓
+Response
+```
+
+Adapt the flow to the actual implementation.
+
+---
+
+# SEQUENCE DIAGRAMS
+
+Generate Mermaid sequence diagrams for the major application flows.
+
+Example:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant Repository
+    participant Database
+    participant ExternalSystem
+
+    Client->>Controller: Request
+    Controller->>Service: Process request
+    Service->>Repository: Query data
+    Repository->>Database: SQL query
+    Database-->>Repository: Result
+    Service->>ExternalSystem: API request
+    ExternalSystem-->>Service: API response
+    Service-->>Controller: Result
+    Controller-->>Client: HTTP response
+```
+
+The above is only an example.
+
+Replace it with the actual implementation.
+
+Generate diagrams for important flows such as:
+
+* Primary business flow
+* Important API flow
+* Database interaction
+* External integration
+* Authentication/security flow
+* Scheduled/background processing
+* Application A ↔ Application B interaction, if applicable
+
+---
+
+# DATABASE DOCUMENTATION
+
+Identify all databases and persistence technologies.
+
+Document:
+
+* Database technology
+* Connection mechanism
+* ORM/framework
+* Entities
+* Tables that can be identified
+* Collections if MongoDB is used
+* Repositories
+* Important queries
+* Relationships
+* Transactions
+* Migration mechanism
+* Connection pooling
+* Database configuration mechanism
+
+Create a table:
+
+| Entity/Model | Table/Collection | Repository | Purpose | Relationships |
+| ------------ | ---------------- | ---------- | ------- | ------------- |
+
+Do not expose credentials or connection secrets.
+
+Do not claim database relationships unless supported by code/schema/migrations.
+
+---
+
+# EXTERNAL INTEGRATIONS
+
+Automatically identify external systems.
+
+Do not assume the systems in this prompt exist.
+
+Discover integrations from the repository.
+
+Potential examples could include:
+
+* REST APIs
+* BigID
+* Microsoft services
+* Entra ID
+* Vault
+* SMTP
+* GitLab
+* MongoDB
+* SQL Server
+* Kafka
+* Other enterprise systems
+
+For each confirmed integration document:
+
+| External System | Integration Type | Purpose | Calling Component | Endpoint/Interface | Authentication | Failure Handling |
+| --------------- | ---------------- | ------- | ----------------- | ------------------ | -------------- | ---------------- |
+
+Never expose credentials or secrets.
+
+If the exact external endpoint contains sensitive internal information, describe it generically rather than reproducing sensitive values.
+
+---
+
+# SECURITY DOCUMENTATION
+
+Analyze:
+
+* Spring Security
+* OAuth2
+* OIDC
+* JWT
+* SAML
+* Basic authentication
+* API authentication
+* Authorization
+* Roles/permissions
+* Security filters
+* Authentication providers
+* Token validation
+* CSRF configuration
+* CORS configuration
+* Service-to-service authentication
+
+Only document mechanisms actually present.
+
+Explain the authentication flow.
+
+Generate a Mermaid diagram when appropriate.
+
+Do not expose:
+
+* Tokens
+* Secrets
+* Certificates
+* Client secrets
+* Private keys
+* Passwords
+
+---
+
+# CONFIGURATION DOCUMENTATION
+
+Identify important configuration properties.
+
+Group them into:
+
+* Application configuration
+* Database
+* External APIs
+* Security
+* Logging
+* Messaging
+* Feature flags
+* Scheduling
+* Monitoring
+* Environment-specific configuration
+
+Use:
+
+| Property | Purpose | Required? | Source | Sensitive? |
+| -------- | ------- | --------- | ------ | ---------- |
+
+For sensitive values write:
+
+`[REDACTED / SECRET MANAGED]`
+
+Do not reproduce actual secret values.
+
+Also explain the configuration precedence/profile mechanism when it can be established.
+
+---
+
+# SCHEDULERS AND BACKGROUND PROCESSING
+
+Identify:
+
+* `@Scheduled`
+* Scheduled executors
+* Batch jobs
+* Async processing
+* Message consumers
+* Event listeners
+* Background workers
+* Retry mechanisms
+
+For each document:
+
+* Trigger
+* Frequency
+* Entry point
+* Processing logic
+* Dependencies
+* Failure behavior
+* Concurrency considerations
+
+Do not invent schedules.
+
+---
+
+# ERROR HANDLING
+
+Identify:
+
+* Global exception handlers
+* `@ControllerAdvice`
+* Custom exceptions
+* HTTP error responses
+* Retry mechanisms
+* Fallbacks
+* Circuit breakers
+* Validation failures
+* Database failures
+* External API failures
+* Logging behavior
+
+Create an error-handling overview.
+
+Where useful:
+
+```text
+Request
+  ↓
+Validation Failure ──→ 4xx
+  ↓
+Business Exception ─→ Appropriate error
+  ↓
+External Failure ──→ Retry/Fallback/Error
+  ↓
+Unexpected Exception ─→ Global Handler
+```
+
+Only use behavior supported by the code.
+
+---
+
+# LOGGING AND MONITORING
+
+Identify:
+
+* Logging framework
+* Log levels
+* Structured logging
+* Correlation IDs
+* Request tracing
+* Health endpoints
+* Actuator
+* Metrics
+* Prometheus
+* Grafana
+* ELK
+* Alerts
+* Error tracking
+
+Document only confirmed mechanisms.
+
+Explain how a production support engineer would use the available logs/health checks to investigate failures.
+
+---
+
+# DEPLOYMENT DOCUMENTATION
+
+Analyze deployment-related files.
+
+Identify, where available:
+
+* Docker
+* Kubernetes
+* AKS
+* Helm
+* ConfigMaps
+* Secrets
+* Deployments
+* Services
+* Ingress
+* Probes
+* Resource limits
+* Environment variables
+* CI/CD pipeline
+* Build process
+* Deployment process
+
+Create a deployment flow:
+
+```text
+Source Code
+    ↓
+Build
+    ↓
+Artifact / Container Image
+    ↓
+CI/CD
+    ↓
+Container Registry
+    ↓
+Kubernetes / AKS
+    ↓
+Application Pod
+    ↓
+External Dependencies
+```
+
+Replace this with the actual architecture.
+
+Never expose sensitive deployment information.
+
+---
+
+# CI/CD
+
+Identify:
+
+* Pipeline files
+* Build stages
+* Test stages
+* Static analysis
+* Security scanning
+* Docker image creation
+* Artifact publishing
+* Deployment stages
+* Environment promotion
+
+Document the actual pipeline.
+
+If the complete pipeline is not present in the repository, clearly state:
+
+> "The complete CI/CD process cannot be determined from the available repository files."
+
+---
+
+# TESTING
+
+Analyze:
+
+* Unit tests
+* Integration tests
+* Mocking
+* Testcontainers
+* Repository tests
+* Controller tests
+* Service tests
+* End-to-end tests
+
+Document:
+
+* Testing framework
+* Test structure
+* Important test scenarios
+* Coverage information if explicitly available
+
+Do not invent test coverage percentages.
+
+---
+
+# DEPENDENCY ANALYSIS
+
+Analyze Maven/Gradle dependencies.
+
+Group them into:
+
+* Spring
+* Database
+* Security
+* HTTP clients
+* Messaging
+* Observability
+* Testing
+* Utility libraries
+* Internal libraries
+
+Create a table:
+
+| Dependency | Version | Purpose | Used By |
+| ---------- | ------- | ------- | ------- |
+
+Do not simply dump the entire dependency file.
+
+Focus on meaningful runtime and development dependencies.
+
+---
+
+# APPLICATION A ↔ APPLICATION B RELATIONSHIP
+
+After independently understanding both applications, determine whether they interact.
+
+Investigate:
+
+* REST calls
+* Shared databases
+* Shared messaging
+* Shared libraries
+* Shared configuration
+* Authentication relationships
+* Event-based communication
+* Operational dependencies
+
+If they interact, document:
+
+```text
+Application A
+     |
+     | HTTP / Messaging / DB / Other
+     ↓
+Application B
+```
+
+Explain the actual dependency.
+
+If they do not interact, explicitly state:
+
+> "No direct interaction between the two applications was identified from the analyzed repository."
+
+Do not assume they are related simply because they exist in the same workspace.
+
+---
+
+# NEW DEVELOPER ONBOARDING SECTION
+
+Create a dedicated section:
+
+## "How to Understand This Application"
+
+Explain the recommended reading order.
+
+For example:
+
+1. Start with README
+2. Open main Spring Boot class
+3. Understand configuration
+4. Understand controllers
+5. Follow major business flow
+6. Read services
+7. Read repositories
+8. Understand database
+9. Understand external integrations
+10. Review deployment
+11. Review tests
+
+Then provide the **5–10 most important classes/files a new developer should read first**, with explanations.
+
+This section is particularly important.
+
+---
+
+# PRODUCTION SUPPORT / RUNBOOK
+
+Create a practical operational section.
+
+Include, where discoverable:
+
+## Application health
+
+How to determine whether the application is healthy.
+
+## Common failure points
+
+Based on actual code/configuration, identify likely failure points.
+
+Clearly distinguish:
+
+* Confirmed failure handling
+* Architectural risk/inference
+
+## Troubleshooting flow
+
+For example:
+
+```text
+Issue Reported
+      ↓
+Check Application Health
+      ↓
+Check Logs
+      ↓
+Check Correlation ID
+      ↓
+Check Database
+      ↓
+Check External Dependency
+      ↓
+Check Recent Deployment
+      ↓
+Identify Root Cause
+```
+
+Adapt this to the actual application.
+
+Do not claim that a specific operational procedure exists unless supported by repository documentation.
+
+---
+
+# TECHNICAL RISKS / TECHNICAL DEBT
+
+Identify observable technical concerns such as:
+
+* Deprecated dependencies
+* Hard-coded configuration
+* Duplicate code
+* Tight coupling
+* Missing tests
+* Large classes
+* Complex methods
+* Poor separation of concerns
+* Missing error handling
+* Potential scalability concerns
+* Security concerns visible from configuration/code
+* Configuration inconsistencies
+* TODO/FIXME markers
+
+Be factual.
+
+Do not exaggerate.
+
+For every finding provide:
+
+| Finding | Evidence | Potential Impact | Confidence |
+| ------- | -------- | ---------------- | ---------- |
+
+Use confidence:
+
+* High — directly visible in code
+* Medium — strong inference
+* Low — requires further investigation
+
+Do not automatically label something a vulnerability unless there is sufficient evidence.
+
+---
+
+# ARCHITECTURE DIAGRAM
+
+Create a high-level Mermaid architecture diagram.
+
+Example:
+
+```mermaid
+flowchart LR
+    Client --> App
+    App --> Database
+    App --> ExternalSystem
+    App --> Auth
+```
+
+Replace this with the actual architecture discovered from the repository.
+
+---
+
+# GLOSSARY
+
+Create a glossary of:
+
+* Business terminology
+* Application-specific terminology
+* Technical acronyms
+* External systems
+* Important domain objects
+
+Do not invent business definitions.
+
+If a term cannot be determined from the repository, state that further business documentation is required.
+
+---
+
+# FINAL CONFLUENCE DOCUMENT STRUCTURE
+
+Produce the final output using this structure:
+
+# [Application Name] — Technical Documentation
+
+## 1. Document Information
+
+* Application name
+* Version/release if discoverable
+* Documentation generated from
+* Last analyzed source state
+* Documentation status
+* Known documentation gaps
+
+## 2. Executive Summary
+
+Short overview suitable for architects, BAs, managers and developers.
+
+## 3. Business Purpose
+
+What the application does and why it exists.
+
+## 4. High-Level Architecture
+
+Architecture description + Mermaid diagram.
+
+## 5. Technology Stack
+
+| Technology | Version | Purpose |
+| ---------- | ------- | ------- |
+
+## 6. Application Structure
+
+Package/module structure and important components.
+
+## 7. Component Responsibilities
+
+Major classes/components and responsibilities.
+
+## 8. API Documentation
+
+REST endpoints and flows.
+
+## 9. Business Workflows
+
+Major workflows with sequence diagrams.
+
+## 10. Database
+
+Entities, repositories, tables/collections and persistence.
+
+## 11. External Integrations
+
+External systems and integration mechanisms.
+
+## 12. Security
+
+Authentication, authorization and security architecture.
+
+## 13. Configuration
+
+Important configuration and environment handling.
+
+## 14. Scheduled / Background Processing
+
+Schedulers, jobs and asynchronous processing.
+
+## 15. Error Handling
+
+Exception and failure handling.
+
+## 16. Logging & Monitoring
+
+Observability and operational visibility.
+
+## 17. Deployment Architecture
+
+Docker/Kubernetes/AKS/other infrastructure.
+
+## 18. CI/CD
+
+Build and deployment pipeline.
+
+## 19. Testing
+
+Testing architecture and important scenarios.
+
+## 20. Dependencies
+
+Important runtime/development dependencies.
+
+## 21. Production Support / Runbook
+
+Health checks, troubleshooting and failure investigation.
+
+## 22. Technical Risks / Technical Debt
+
+Evidence-based observations.
+
+## 23. Application A ↔ Application B Relationship
+
+Only if applicable.
+
+## 24. New Developer Onboarding Guide
+
+Recommended learning path.
+
+## 25. Glossary
+
+Important terminology.
+
+## 26. Documentation Gaps / Questions
+
+Things that cannot be determined from the repository and require confirmation from developers, architects, BAs, DevOps or other stakeholders.
+
+---
+
+# DOCUMENTATION QUALITY REQUIREMENTS
+
+The final document must be:
+
+* Professional
+* Clear
+* Concise where possible
+* Technically detailed where necessary
+* Suitable for Confluence
+* Easy to navigate
+* Useful to someone unfamiliar with the application
+
+Use:
+
+* Markdown headings
+* Tables
+* Bullet points
+* Mermaid diagrams
+* Code snippets only where useful
+* Callouts for important information
+
+Avoid:
+
+* Huge walls of text
+* Repeating the same information
+* Copying entire source files
+* Documenting trivial getters/setters
+* Unsupported assumptions
+* Marketing language
+* Generic Spring Boot explanations that don't explain this application
+
+Focus on **how THIS application actually works**.
+
+---
+
+# IMPORTANT: EXPLAIN THE "WHY"
+
+Do not merely describe:
+
+> `ScanService.java calls BigIDClient.java`
+
+Explain the actual flow:
+
+> `ScanController` receives the request and delegates processing to `ScanService`. The service performs the required validation/business logic and invokes the BigID client to initiate the operation. The resulting state is persisted/retrieved through the relevant repository before the response is returned.
+
+Only write this type of explanation when supported by the code.
+
+The objective is to allow a developer to understand the application **without having to read the entire codebase**.
+
+---
+
+# SOURCE TRACEABILITY
+
+For important architectural claims, include the source file/class that supports the claim.
+
+Example:
+
+> The application uses a layered architecture with controller, service and repository layers.
+
+**Evidence:**
+`ScanController.java` → `ScanService.java` → `ScanRepository.java`
+
+Where useful, include file paths:
+
+```text
+src/main/java/.../controller/ScanController.java
+src/main/java/.../service/ScanService.java
+src/main/java/.../repository/ScanRepository.java
+```
+
+This allows developers to verify the documentation against the source code.
+
+---
+
+# FINAL VERIFICATION PASS
+
+Before producing the final documentation, perform a second review.
+
+Check:
+
+### Accuracy
+
+Does every major statement have evidence?
+
+### Completeness
+
+Did you inspect both applications?
+
+### Security
+
+Did you accidentally expose any:
+
+* password
+* token
+* API key
+* secret
+* certificate
+* private key
+* sensitive connection string?
+
+If yes, remove it.
+
+### Architecture
+
+Do the diagrams represent the actual implementation?
+
+### APIs
+
+Are endpoints based on actual controller mappings?
+
+### Database
+
+Are entities/tables based on actual code/schema?
+
+### Integrations
+
+Are external systems based on actual clients/configuration?
+
+### Deployment
+
+Are deployment claims based on repository files?
+
+### Unknowns
+
+Are uncertain items explicitly marked?
+
+### Duplication
+
+Remove repetitive explanations.
+
+---
+
+# FINAL OUTPUT
+
+Produce:
+
+1. **Application A — Complete Confluence Documentation**
+2. **Application B — Complete Confluence Documentation**
+3. **Cross-Application Architecture / Relationship**
+4. **Documentation Gaps & Questions**
+
+The output must be directly usable as a Confluence page after minor formatting adjustments.
+
+Do not provide a generic explanation of how Spring Boot works.
+
+Document the **actual applications in this workspace**.
+
+Begin by analyzing the complete workspace before writing the final documentation.
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Follow up:
+
+Continue the documentation task from the previous analysis.
+
+Do NOT restart the analysis.
+
+Review the source code and your previously identified architecture, then continue generating the remaining Confluence documentation sections.
+
+Maintain all previous rules:
+
+* No hallucinations
+* No assumptions presented as facts
+* No secrets or credentials
+* No code modifications
+* Cite important source files/classes
+* Use Mermaid for important flows
+* Distinguish confirmed facts, inferences and unknowns
+* Focus on the actual implementation
+
+Before finishing, perform the verification pass again for accuracy and sensitive information.
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+One more prompt:
+Act as a senior Java/Spring Boot architect performing a documentation audit.
+
+Review the generated documentation against the complete source code of the application.
+
+Do NOT rewrite the entire document yet.
+
+Instead, identify:
+
+1. Important components that were missed
+2. APIs that were missed
+3. Important business flows that were missed
+4. External integrations that were missed
+5. Database entities/tables that were missed
+6. Security mechanisms that were missed
+7. Scheduled/background processes that were missed
+8. Deployment/configuration details that were missed
+9. Incorrect statements in the documentation
+10. Statements that are assumptions rather than confirmed facts
+11. Architecture diagrams that do not accurately represent the code
+12. Important technical debt or risks that were overlooked
+13. Information that should be removed because it is sensitive
+14. Documentation gaps that require confirmation from the development/architecture/BA/DevOps teams
+
+For every finding provide:
+
+| Finding | Evidence in Source Code | Severity | Recommended Documentation Change |
+| ------- | ----------------------- | -------- | -------------------------------- |
+
+Use:
+
+* High — important correctness/completeness issue
+* Medium — useful missing information
+* Low — minor documentation improvement
+
+Do not invent findings.
+
+After the audit, provide a concise prioritized list of changes that should be made to the documentation.
