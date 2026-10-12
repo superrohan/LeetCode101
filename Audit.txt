@@ -1,0 +1,117 @@
+# Task: Audit the existing Notification Router before production hardening
+
+Act as a senior Java/Spring Boot engineer and production engineer working on an enterprise application deployed to Kubernetes/AKS.
+
+## Context
+
+We have an existing Notification Router application that intercepts BigID notification emails, classifies them, evaluates configurable rules, persists processing and delivery outcomes in SQL Server, and forwards permitted notifications through an outbound SMTP relay.
+
+A POC has already been deployed to the Dev environment. We want to evolve the existing application into a production-grade implementation without rebuilding it from scratch.
+
+The functional requirements are documented in the team's Notification Router requirements, including:
+
+1. Distinguishing different overdue notification types.
+2. Filtering RemediationOverDue notifications by datasource-name prefixes and configured text criteria.
+3. Replacing or adding recipients for specific notification types, including failed rescans, with Logfile cases excluded from recipient replacement.
+4. Preserving existing behavior for notification types that are not yet supported by routing rules.
+
+There are 27 notification types in total. For the initial release, rule-based behavior must apply ONLY to RemediationOverDue. All other notification types must continue through the existing delivery path without RemediationOverDue-specific filtering.
+
+## Non-negotiable constraints
+
+- Do not rebuild the application from scratch.
+- Do not overwrite or replace working UBS-specific infrastructure configuration.
+- Do not modify ci.yaml, charts.yaml, Helm charts, deployment templates, pipeline definitions, environment-specific values, or secret-management configuration during this audit.
+- Inspect these files locally if necessary to understand the deployment environment, but treat them as read-only.
+- Never print, copy, or expose credentials, tokens, internal hostnames, or other sensitive configuration values in reports.
+- Do not introduce new infrastructure, messaging platforms, databases, or external dependencies without establishing a clear requirement and obtaining approval.
+- Reuse existing application components and tests wherever appropriate.
+- Do not assume that the current POC configuration is suitable for production.
+- Do not execute deployment commands, modify Dev resources, send real emails, or make external API calls.
+- Do not change any files during this initial audit.
+
+## Audit tasks
+
+### A. Application architecture
+
+Inspect the complete application source and document:
+
+- SMTP receiver lifecycle and inbound email processing.
+- MIME parsing and notification classification.
+- Rule evaluation, priority handling, and default behavior.
+- Recipient modification and forwarding.
+- SQL Server persistence, Flyway migrations, and transaction boundaries.
+- Idempotency and duplicate-message handling.
+- SMTP failure handling and current retry behavior.
+- Health endpoints, logging, metrics, and security controls.
+- Existing unit and integration tests.
+
+Identify correctness issues, incomplete implementations, and risky assumptions.
+
+### B. Functional correctness
+
+Determine whether the current implementation satisfies these scenarios:
+
+1. A RemediationOverDue email matches a FORWARD rule.
+2. A RemediationOverDue email matches a SUPPRESS rule.
+3. A RemediationOverDue email matches no rule.
+4. An unrelated notification arrives while RemediationOverDue rules are configured.
+5. A rule adds recipients.
+6. A rule replaces recipients.
+7. A failed-rescan notification is routed to the operations mailbox.
+8. A Logfile failed-rescan notification retains the intended original recipients.
+9. A message is received more than once.
+10. Inbound parsing, database persistence, or outbound SMTP delivery fails.
+
+Identify missing tests and explain the expected behavior for each case.
+
+### C. Production readiness
+
+Assess the current implementation for:
+
+- SMTP relay security and permitted senders.
+- TLS and authentication requirements.
+- Database connection pooling, transaction handling, schema ownership, and migration safety.
+- Multi-replica behavior and concurrency.
+- Reliable processing when the application or database becomes unavailable.
+- Duplicate delivery risks and retry safety.
+- Graceful startup, shutdown, and readiness/liveness probes.
+- Configuration externalization and secret handling.
+- Structured logs, operational metrics, alerting, and troubleshooting.
+- BigID API integration requirements.
+- Deployment compatibility with the existing UBS Dev environment.
+
+Clearly distinguish confirmed defects from risks that require environment-specific verification.
+
+### D. BigID integration
+
+Inspect whether a real BigID client exists and whether datasource details can be retrieved.
+
+Determine which requirements can be implemented directly from email content and which genuinely require API enrichment.
+
+Do not invent API endpoints, authentication methods, response fields, or credentials. List the missing information needed to implement the integration safely.
+
+### E. Compatibility and changes
+
+Inspect the current Java version, Spring Boot version, Maven dependencies, database driver, and existing testing setup.
+
+Recommend changes based on the approved UBS technology baseline rather than blindly upgrading dependencies.
+
+Identify any dangerous configuration defaults, including whether a local development profile could be activated unintentionally in Dev or production.
+
+## Required output
+
+Produce an audit report containing:
+
+1. Current architecture and processing flow.
+2. Existing functionality that should be retained.
+3. Confirmed defects and production risks, prioritized as Critical, High, Medium, or Low.
+4. Missing functionality mapped to the requirements.
+5. Missing tests and recommended test cases.
+6. Proposed phased implementation plan.
+7. Application changes versus infrastructure changes, clearly separated.
+8. Questions requiring input from the UBS infrastructure team, SMTP administrators, database team, or BigID team.
+
+For each finding, identify the relevant file and class or configuration key without exposing sensitive values.
+
+Do not implement anything yet. Do not edit files. Wait for review and approval of the audit and proposed implementation plan.
