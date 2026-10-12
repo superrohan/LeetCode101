@@ -112,6 +112,25 @@ Produce an audit report containing:
 7. Application changes versus infrastructure changes, clearly separated.
 8. Questions requiring input from the UBS infrastructure team, SMTP administrators, database team, or BigID team.
 
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Using the existing Notification Router review as the baseline, implement Phase 1 production-safety fixes only.
+
+First inspect the relevant configuration classes, application profiles, and existing tests. Fix required SMTP configuration validation, prevent unsafe local-profile activation in deployed environments, and correct any confirmed logging configuration issues.
+
+Preserve the current architecture, database schema, rule-engine behavior, and PASS_THROUGH behavior for unsupported notification types.
+
+Add or update focused tests. Do not implement new business rules, BigID API integration, HA, or unrelated refactoring.
+
+Before editing, briefly list the exact files you intend to change. Then implement the changes and report the tests executed and their results. Do not repeat the full repository review.
+
 For each finding, identify the relevant file and class or configuration key without exposing sensitive values.
 
 Do not implement anything yet. Do not edit files. Wait for review and approval of the audit and proposed implementation plan.
