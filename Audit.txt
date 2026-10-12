@@ -134,3 +134,20 @@ Before editing, briefly list the exact files you intend to change. Then implemen
 For each finding, identify the relevant file and class or configuration key without exposing sensitive values.
 
 Do not implement anything yet. Do not edit files. Wait for review and approval of the audit and proposed implementation plan.
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Approved. Proceed with the minimal Phase 1 changes you listed.
+
+Two constraints:
+1. Remove implicit activation of the local profile while preserving explicit local development through `SPRING_PROFILES_ACTIVE=local`.
+2. Validate only the configuration fields that are genuinely required for the selected SMTP mode. Do not introduce unconditional credential requirements that conflict with an approved relay configuration.
+
+Keep the changes limited to the listed application, configuration, Helm, and focused test files. Preserve all existing business behavior, database schema, rule-engine behavior, and PASS_THROUGH semantics.
+
+Run the full Maven test suite after the changes. Report the exact files changed, test results, and any remaining warnings. Do not perform another broad review or unrelated refactoring.
