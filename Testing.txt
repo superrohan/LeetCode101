@@ -1,0 +1,14 @@
+Inspect the existing Notification Router's inbound SMTP server implementation.
+
+Context: The application must act as an SMTP server for BigID. The BA needs the server endpoint, port, username, and password to configure in BigID Email Setup.
+
+Report:
+
+1. Which SMTP protocol features the current inbound listener supports.
+2. Whether it supports SMTP AUTH using a configured username and password.
+3. Whether it supports STARTTLS.
+4. How inbound credentials could be configured securely through the existing Helm/Kubernetes secret setup.
+5. What endpoint BigID would need to reach, given that the Kubernetes Service is currently ClusterIP on port 2525.
+6. The minimal implementation changes needed to support authenticated inbound SMTP, if missing.
+
+Do not edit files, deploy, or send emails. Do not expose secrets. Preserve existing notification processing, database schema, rule-engine behavior, and PASS_THROUGH semantics.
