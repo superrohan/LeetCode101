@@ -12,3 +12,32 @@ Report:
 6. The minimal implementation changes needed to support authenticated inbound SMTP, if missing.
 
 Do not edit files, deploy, or send emails. Do not expose secrets. Preserve existing notification processing, database schema, rule-engine behavior, and PASS_THROUGH semantics.
+
+
+
+
+--------------------
+
+
+Implement the minimal changes required to support authenticated inbound SMTP for the existing Notification Router.
+
+Requirements:
+
+1. Inspect the existing SMTP server library and determine how it supports SMTP AUTH and STARTTLS. Reuse the existing library if it supports both features. If it does not, explain the smallest viable alternative before making dependency or architecture changes.
+2. Add configurable inbound SMTP authentication using a username and password supplied securely through the existing Helm/Kubernetes Secret setup.
+3. Require successful authentication before accepting message submission when authentication is enabled. Reject invalid credentials and unauthenticated submission.
+4. Implement STARTTLS with configurable certificate and private-key material, using the existing deployment conventions where possible. Do not hardcode certificates, private keys, or passwords.
+5. Ensure credentials cannot be logged or transmitted before TLS is established. Confirm that the AUTH mechanism is compatible with BigID's Basic authentication setting.
+6. Keep existing sender allowlisting, NotificationSmtpMessageHandler, InboundEmailProcessingService, database schema, rule engine, FORWARD/SUPPRESS/PASS_THROUGH behavior, and outbound SMTP configuration unchanged.
+7. Add focused tests for successful authentication, invalid credentials, unauthenticated submission, and STARTTLS behavior.
+8. Run the relevant tests and report the results.
+
+Constraints:
+
+- Make only changes necessary for inbound SMTP AUTH and STARTTLS.
+- Do not deploy, send emails, expose services publicly, or reveal secrets.
+- Do not put credentials in ConfigMaps or source control.
+- Do not weaken TLS certificate verification or silently fall back to unauthenticated SMTP.
+- If the current library cannot safely support the required behavior, stop and explain the options rather than performing a broad refactor.
+
+Before editing, briefly identify the library's capabilities and the files you intend to change. Then implement the changes and summarize the modified files, configuration keys, tests, and any remaining infrastructure requirements.
