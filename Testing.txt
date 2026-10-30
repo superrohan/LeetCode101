@@ -61,3 +61,26 @@ Verify these items against the actual code and Helm templates:
 9. Identify any missing infrastructure prerequisites, including certificate trust, Secret provisioning, and BigID network access.
 
 Run the focused tests and the full Maven test suite if practical. Report the exact results and any remaining blockers. Do not deploy, send emails, print secrets, or perform unrelated refactoring.
+
+
+
+
+------------------------------------------------
+
+Investigate only the empty "helm/templates/smtp-receiver-secret.yaml" in the Notification Router repository.
+
+Context:
+
+- Our DevCloud deployment configuration, including Secret values and deployment-related settings, is maintained directly on the server.
+- Do not assume the repository's Helm configuration is the source of truth for the running server.
+- Do not change the application profile configuration or any other files.
+
+Tasks:
+
+1. Inspect "helm/templates/smtp-receiver-secret.yaml", "helm/templates/deployment.yaml", and the relevant "helm/values.yaml" settings.
+2. Explain whether the empty Secret template is intentional because an externally managed Kubernetes Secret is expected, or whether it leaves a missing Secret when Helm deploys the chart.
+3. Identify the exact Secret name and keys the application expects, including SMTP username/password and TLS keystore/key passwords.
+4. Explain how to verify whether the deployment references an externally created Secret, without displaying any secret values.
+5. Do not edit any files yet. Do not deploy anything.
+
+Return a concise diagnosis and the smallest safe fix, if one is actually needed.
