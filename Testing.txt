@@ -41,3 +41,23 @@ Constraints:
 - If the current library cannot safely support the required behavior, stop and explain the options rather than performing a broad refactor.
 
 Before editing, briefly identify the library's capabilities and the files you intend to change. Then implement the changes and summarize the modified files, configuration keys, tests, and any remaining infrastructure requirements.
+
+
+
+-------------------------------------
+
+Review only the inbound SMTP AUTH + STARTTLS implementation you just added. Do not make code changes unless you identify a specific defect; report findings first.
+
+Verify these items against the actual code and Helm templates:
+
+1. SMTP AUTH is accepted only after a successful STARTTLS handshake when authentication is enabled.
+2. The server rejects unauthenticated message submission and invalid credentials.
+3. AUTH is not advertised before TLS is active, and credentials cannot be transmitted in cleartext.
+4. TLS keystore loading, certificate/private-key configuration, and startup validation are correct.
+5. Helm Secret references match the environment variables consumed by Spring Boot. No credentials are present in ConfigMaps, source control, or logs.
+6. The keystore file is expected at a real mounted path, and the Helm deployment supports that mount or clearly documents the required external mount.
+7. The implementation is compatible with BigID's Basic + StartTLS configuration, including the supported AUTH mechanisms.
+8. Existing sender allowlisting, outbound SMTP configuration, message handling, rule evaluation, database schema, and PASS_THROUGH behavior remain unchanged.
+9. Identify any missing infrastructure prerequisites, including certificate trust, Secret provisioning, and BigID network access.
+
+Run the focused tests and the full Maven test suite if practical. Report the exact results and any remaining blockers. Do not deploy, send emails, print secrets, or perform unrelated refactoring.
