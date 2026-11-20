@@ -1,3 +1,111 @@
+The BA has clarified the final business requirement for location-based Remediation Overdue notification filtering.
+
+### Business requirement
+
+The Notification Router already identifies Remediation Overdue emails correctly. Preserve this existing classification behavior.
+
+The new requirement is to manage Remediation Overdue notifications separately for each datasource location.
+
+The BA will provide the complete list of supported locations and their datasource prefixes. Every supported location must have a corresponding rule stored in the database.
+
+Examples of datasource prefixes:
+
+- CH- : Switzerland
+- HK- : Hong Kong
+- LU- : Luxembourg
+- UK- : United Kingdom
+
+These are illustrative examples. Use the actual list supplied by the BA.
+
+### Operations team behavior
+
+The Operations team must be able to activate or deactivate notifications for each location through the database rule configuration.
+
+Expected behavior:
+
+- Location rule enabled = true: FORWARD the Remediation Overdue notification.
+- Location rule enabled = false: SUPPRESS the Remediation Overdue notification.
+- No matching location rule: SUPPRESS the notification.
+- Missing or unrecognized datasource prefix: SUPPRESS the notification.
+
+The subject line is the only field used for location/prefix matching. Do not inspect the email body for location identification.
+
+### Existing notification behavior
+
+- Continue identifying Remediation Overdue notifications using the existing classifier.
+- Apply location-based rules only to Remediation Overdue notifications.
+- All other notification types must retain their existing PASS_THROUGH behavior.
+- Preserve the existing FORWARD, SUPPRESS and PASS_THROUGH semantics.
+
+### Database requirements
+
+Use the existing notification_rule table if its current structure can support this requirement cleanly.
+
+Inspect whether the existing rule model supports:
+
+- Notification type
+- Subject matching criteria
+- Datasource/location prefix
+- Enabled/disabled state
+- Action
+
+Avoid introducing unnecessary tables or migrations.
+
+The location prefix and matching conditions must be database-driven. No location prefixes or location-specific subject matching should remain hardcoded in Java.
+
+### Rule matching requirements
+
+1. Extract the datasource prefix from the Remediation Overdue email subject.
+2. Find the corresponding location rule in the database.
+3. If enabled, forward.
+4. If disabled, suppress.
+5. If no rule matches, suppress.
+6. If the subject does not contain a valid datasource prefix, suppress.
+7. Do not allow an unmatched or disabled rule to fall back to a generic forwarding rule.
+
+### Initial task: inspect only
+
+Do not edit files yet.
+
+Inspect the current classifier, rule entity, repository, rule engine, notification_rule schema, Flyway migrations, and tests.
+
+Report:
+
+1. Current database rule structure.
+2. Whether it can support location-specific subject matching and activation/deactivation.
+3. The minimal schema changes, if any.
+4. The exact rule evaluation flow you propose.
+5. How unknown prefixes and disabled rules will be handled.
+6. Any impact on existing notification processing and audit records.
+7. The tests required.
+
+Wait for review before implementing.
+
+Do not refactor unrelated code or change SMTP AUTH/STARTTLS functionality.
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Inspect the existing Notification Router's inbound SMTP server implementation.
 
 Context: The application must act as an SMTP server for BigID. The BA needs the server endpoint, port, username, and password to configure in BigID Email Setup.
