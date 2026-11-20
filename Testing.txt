@@ -1,3 +1,359 @@
+# Implement Database-Driven Location-Based Filtering for Remediation Overdue Notifications
+
+You are working on an existing Java Spring Boot application called **Notification Router**.
+
+The application receives emails from BigID through SMTP, identifies notification types, evaluates database-backed rules, and decides whether to FORWARD, SUPPRESS, or PASS_THROUGH notifications.
+
+The existing application already supports:
+- Inbound SMTP email reception.
+- Remediation Overdue notification classification.
+- Database-backed notification rules.
+- FORWARD, SUPPRESS, and PASS_THROUGH actions.
+- Notification processing and delivery tracking.
+- SQL Server database with Flyway migrations.
+
+## 1. Business requirement
+
+The BA has clarified the requirement.
+
+We do NOT want a generic rule that forwards all Remediation Overdue notifications.
+
+We need to filter **Remediation Overdue notifications based on datasource location and datasource type (CID or CREDENTIAL)**.
+
+The Operations team must be able to enable or disable notifications independently for every location and datasource type by changing database rules.
+
+There must be NO hardcoded list of locations or hardcoded location-specific filtering rules in Java code.
+
+## 2. How BigID generates the subject
+
+BigID's existing notification subject template is:
+
+`cDev: [Action Required] Remediation overdue notification - ${datasourceName}`
+
+BigID dynamically replaces `${datasourceName}` with the actual datasource name.
+
+Examples:
+
+**CID datasources:**
+- `CH-SHRPNT`
+- `UK-GITLAB_FileLocation_Embedded_files_PPT_SCANNING_QA6_001`
+- `HK-<datasource-name>`
+
+**Credential datasources:**
+- `AM-ONEDRV-CRED-Cloud-43490091_US_001`
+- `AM-ONEDRV-CRED-Cloud-43490091_US_002`
+- `AM-ONEDRV-CRED-Cloud-PI18_QA_001`
+
+Important naming conventions:
+
+1. The location prefix is ALWAYS the first two-letter code before the first hyphen.
+2. This applies to BOTH CID and CREDENTIAL datasources.
+3. Examples:
+   - `CH-SHRPNT` → location `CH`
+   - `UK-GITLAB_...` → location `UK`
+   - `AM-ONEDRV-CRED-...` → location `AM`
+4. Do NOT extract the location from `_US_001` or any other part of the datasource name.
+5. A datasource is classified as CREDENTIAL when its name contains the standalone `CRED` token, separated by hyphens. Otherwise, classify it as CID.
+6. Do not assume that every datasource name containing the letters `CRED` anywhere is necessarily a Credential datasource. Use token-based matching.
+
+## 3. Required database-driven rule structure
+
+Inspect the existing `notification_rule` table, entity, repository, and rule engine.
+
+Extend the existing rule model rather than creating an entirely new rule management system.
+
+The rule must support these attributes:
+
+- `id`
+- `name`
+- `enabled`
+- `priority` (preserve if currently used)
+- `notification_type`
+- `datasource_type` (CID or CREDENTIAL)
+- `location_prefix` (for example CH, UK, HK, AM)
+- `action`
+- `created_at`
+- `updated_at`
+
+Reuse existing columns and conventions wherever possible.
+
+If `datasource_type` and `location_prefix` do not exist, add them through a new Flyway migration. Do NOT modify an already-applied migration.
+
+Add an appropriate unique constraint or unique index to prevent duplicate rules for the same notification type, datasource type, and location prefix.
+
+Ensure compatibility with the existing SQL Server database and Flyway conventions.
+
+Do not introduce hardcoded location lists into application code or database seed migrations.
+
+## 4. Required notification processing flow
+
+For every inbound email:
+
+### Step 1: Classify notification type
+
+Continue using the existing notification classifier.
+
+Do not break or replace the current Remediation Overdue classification logic unnecessarily.
+
+### Step 2: Non-Remediation Overdue notifications
+
+If the email is NOT classified as `REMEDIATION_OVERDUE`:
+
+- Preserve the existing notification processing behaviour.
+- Preserve existing PASS_THROUGH behaviour where applicable.
+- Do not apply the new location-based filtering logic.
+
+### Step 3: Extract datasource name
+
+For Remediation Overdue notifications:
+
+- Extract the datasource name from the subject.
+- Use the existing subject format as the basis for extraction.
+- Account for the configured subject prefix and suffix.
+- Handle case and whitespace consistently.
+- Do not assume the datasource name is always a single fixed value.
+
+If the subject does not contain a valid datasource name, SUPPRESS the notification.
+
+### Step 4: Determine datasource location
+
+Extract the first two-letter prefix before the first hyphen.
+
+Examples:
+
+| Datasource name | Location |
+|---|---|
+| CH-SHRPNT | CH |
+| UK-GITLAB_FileLocation_Excel... | UK |
+| HK-<datasource-name> | HK |
+| AM-ONEDRV-CRED-Cloud-43490091_US_001 | AM |
+
+Validate the extracted prefix. If the datasource name is malformed or the prefix cannot be extracted, SUPPRESS the notification.
+
+Do not maintain a hardcoded list of accepted locations. The database rules determine which locations are configured.
+
+### Step 5: Determine datasource type
+
+Classify the datasource as:
+
+- `CREDENTIAL` if the datasource name contains the standalone hyphen-delimited token `CRED`.
+- `CID` otherwise.
+
+Examples:
+
+- `AM-ONEDRV-CRED-Cloud-43490091_US_001` → CREDENTIAL
+- `AM-ONEDRV-Cloud-43287229` → CID
+- `CH-SHRPNT` → CID
+
+### Step 6: Exact database rule lookup
+
+Look up a rule using all three attributes:
+
+- `notification_type = REMEDIATION_OVERDUE`
+- `datasource_type = extracted datasource type`
+- `location_prefix = extracted location`
+
+The lookup must be deterministic and must not accidentally select a generic Remediation Overdue rule.
+
+### Step 7: Apply the rule
+
+Expected behaviour:
+
+| Matching rule | Enabled | Decision |
+|---|---|---|
+| Exists | true | FORWARD |
+| Exists | false | SUPPRESS |
+| Does not exist | N/A | SUPPRESS |
+| Datasource type unknown | N/A | SUPPRESS |
+| Location missing/invalid | N/A | SUPPRESS |
+| Subject malformed | N/A | SUPPRESS |
+
+**Critical business rule:**
+
+For Remediation Overdue notifications, missing or unmatched location rules MUST result in SUPPRESS.
+
+There must be NO fallback to the existing generic `REMEDIATION_OVERDUE + FORWARD` rule.
+
+This is important because an unknown location or an unconfigured datasource must never accidentally generate an email.
+
+## 5. Existing generic rule handling
+
+Inspect the existing default rule seeded in the database:
+
+`REMEDIATION_OVERDUE + FORWARD`
+
+Determine how it currently interacts with the rule engine.
+
+Remove or migrate this generic rule safely if it would otherwise cause unintended forwarding.
+
+Do not silently delete existing production data.
+
+If a migration is needed, make it safe for existing environments and explain the migration behaviour.
+
+Ensure only exact location/type rules control Remediation Overdue forwarding.
+
+## 6. Operations team configuration
+
+The Operations team will receive the list of locations from the BA.
+
+They must be able to configure rules directly in the database.
+
+Example rules (illustrative only; these are NOT the final BA-approved location list):
+
+| Notification type | Datasource type | Location | Enabled | Action |
+|---|---|---|---|---|
+| REMEDIATION_OVERDUE | CID | CH | true | FORWARD |
+| REMEDIATION_OVERDUE | CID | UK | false | SUPPRESS |
+| REMEDIATION_OVERDUE | CID | HK | true | FORWARD |
+| REMEDIATION_OVERDUE | CREDENTIAL | AM | true | FORWARD |
+| REMEDIATION_OVERDUE | CREDENTIAL | CH | false | SUPPRESS |
+
+Important:
+- CID and CREDENTIAL rules must be independently configurable.
+- Enabling CREDENTIAL for one location must NOT enable all Credential notifications globally.
+- Each location must have its own rule for CID and CREDENTIAL.
+- The BA will provide the actual location list later.
+- Do not invent or seed an assumed final location list.
+
+## 7. Implementation scope
+
+Inspect and update only the components necessary, including:
+
+- Rule domain/entity.
+- Rule repository.
+- Rule engine.
+- Subject-based notification classifier or a dedicated datasource extraction component.
+- Flyway database migration.
+- Relevant configuration or enum classes, if necessary.
+- Unit and integration tests.
+
+Keep the implementation aligned with the existing package structure and coding conventions.
+
+Do not introduce a new UI, REST API, or unrelated infrastructure changes.
+
+Do not change:
+- SMTP receiver implementation.
+- SMTP AUTH or STARTTLS implementation.
+- Outbound SMTP configuration.
+- Existing email forwarding mechanism.
+- Notification delivery mechanism.
+- Existing notification message and delivery attempt tracking.
+- Database schema unrelated to this requirement.
+
+## 8. Required tests
+
+Add focused tests for the following cases.
+
+### Datasource extraction
+
+1. `CH-SHRPNT` → CID, CH.
+2. `UK-GITLAB_FileLocation_Excel_SCANNING_QA12_001` → CID, UK.
+3. `AM-ONEDRV-CRED-Cloud-43490091_US_001` → CREDENTIAL, AM.
+4. `AM-ONEDRV-CRED-Cloud-PI18_QA_001` → CREDENTIAL, AM.
+5. `AM-ONEDRV-Cloud-43287229` → CID, AM.
+6. Missing datasource name → invalid.
+7. Missing location prefix → invalid.
+8. Malformed subject → invalid.
+9. A name containing `CRED` as part of a larger token must not automatically be classified as CREDENTIAL.
+
+### Rule evaluation
+
+1. Enabled CID + CH rule → FORWARD.
+2. Disabled CID + CH rule → SUPPRESS.
+3. Enabled CREDENTIAL + AM rule → FORWARD.
+4. Disabled CREDENTIAL + AM rule → SUPPRESS.
+5. CID + CH enabled, CREDENTIAL + CH disabled → respective independent decisions.
+6. Missing CID location rule → SUPPRESS.
+7. Missing CREDENTIAL location rule → SUPPRESS.
+8. Unknown location → SUPPRESS.
+9. No fallback to generic Remediation Overdue FORWARD rule.
+10. Non-Remediation Overdue email → existing behaviour unchanged.
+
+### Regression tests
+
+Ensure:
+- Existing notification classification still works.
+- Existing FORWARD/SUPPRESS/PASS_THROUGH behaviour remains intact outside the new Remediation Overdue location-specific flow.
+- Notification persistence continues to work.
+- Delivery attempt tracking continues to work.
+- Existing database migrations remain valid.
+
+## 9. Execution instructions
+
+Work in two phases.
+
+**Phase 1 — Inspect and propose**
+
+Before editing any files:
+
+1. Inspect the current implementation.
+2. Identify the exact classes and methods involved.
+3. Inspect the current SQL Server schema and Flyway migrations.
+4. Explain the minimal changes required.
+5. Identify how the existing generic default rule will be handled.
+6. Identify any ambiguity or risk in datasource extraction.
+7. Present the proposed implementation plan.
+
+Do not modify any files in Phase 1.
+
+**Phase 2 — Implement**
+
+After presenting the plan, proceed with the minimal implementation.
+
+1. Add the Flyway migration.
+2. Update entity and repository.
+3. Implement datasource extraction.
+4. Update rule evaluation.
+5. Add focused tests.
+6. Run the focused tests.
+7. Run the full Maven test suite.
+8. Report all modified files and migration details.
+
+Do not deploy the application or modify the DevCloud server.
+
+Do not change unrelated code or perform broad refactoring.
+
+If an existing architectural detail conflicts with this requirement, explain the issue before making a potentially breaking change.
+
+## 10. Final expected outcome
+
+The final implementation must guarantee:
+
+- Remediation Overdue emails are filtered by datasource type AND location.
+- Both CID and CREDENTIAL datasources use the first two-letter prefix for location.
+- All location rules are stored in SQL Server.
+- Operations can independently enable/disable each location and datasource type.
+- Unknown or missing rules always suppress Remediation Overdue notifications.
+- No hardcoded location list exists in Java.
+- Existing non-Remediation Overdue processing remains unchanged.
+- Existing SMTP and delivery functionality remains unchanged.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 The BA has clarified the final business requirement for location-based Remediation Overdue notification filtering.
 
 ### Business requirement
